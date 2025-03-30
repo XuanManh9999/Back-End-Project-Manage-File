@@ -21,7 +21,7 @@ spring:
   application:
     name: project-tn
   datasource:
-    url: jdbc:mysql://localhost:3306/db_v1_do_an_clone_udemy
+    url: jdbc:mysql://localhost:3306/db_check_trung_tai_lieu
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

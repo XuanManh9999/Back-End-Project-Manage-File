@@ -63,6 +63,15 @@ public class UserEntity extends BaseEntity<Long> implements UserDetails, Seriali
      @OneToMany(mappedBy = "userId")
      private List<Address> addresses;
 
+
+     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+     private List<FileEntity> files;
+
+
+     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+     private List<CollectionEntity> collections;
+
+
      @Override
      public Collection<? extends GrantedAuthority> getAuthorities() {
           return userRoles.stream()

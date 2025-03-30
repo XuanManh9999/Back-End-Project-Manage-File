@@ -31,4 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
-src/main/resources/fire_base_key_manh.json
+src/main/resources/firebase.json
+project-tn/src/main/resources/firebase.json

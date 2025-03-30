@@ -24,6 +24,9 @@ public class FileEntity extends BaseEntity<Long>{
     private String fileType;
 
     @Column(nullable = false)
+    public String publicID;
+
+    @Column(nullable = false)
     private Long fileSize;
 
     @Column(nullable = false, unique = true)

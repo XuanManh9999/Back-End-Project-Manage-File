@@ -17,12 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 
 public class CollectionEntity extends BaseEntity<Long> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(nullable = false)
     private String name; // Tên bộ sưu tập
+
+    @Column
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

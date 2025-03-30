@@ -1,0 +1,27 @@
+# config
+server:
+  servlet: #/api/v1
+    context-path: ""
+spring:
+  application:
+    name: project-tn
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_v1_do_an_clone_udemy
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+jwt:
+  expiryHour: 1
+  expiryDay: 14
+  secretKey: zzkpqZ1eUo/udLOYXr+/KVcKguT5f2eulxDE/dKjxOWWjsADWEyIBWyUP8EdFZUz
+  refreshKey: nvev8yUsz4hl1wCuSCkvQO+T6NO+ecGjWSBJKRf7N0SuDArEeTPHPHBK1xPe0fAw

@@ -17,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/current")
     public ResponseEntity<CommonResponse> getCurrentUserByToken (
                                                          HttpServletRequest request
@@ -38,7 +38,7 @@ public class UserController {
         return userService.getCurrentUser(token);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PutMapping("")
     public ResponseEntity<CommonResponse> updateUser (
             @RequestBody ChangeInfoUserRequest changeInfoUserRequest,

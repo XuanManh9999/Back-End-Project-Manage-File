@@ -45,26 +45,25 @@ public class AppConfig {
         };
     }
 
+
     // tao mot password encoder dung de ma hoa mat khau
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder(10);
-//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configure(http)) 
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request ->
-                   request.requestMatchers(WHITE_LIST).permitAll()
-                           .anyRequest().authenticated()
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(WHITE_LIST).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .authenticationProvider(provider()).addFilterBefore(preFilterSecurity, UsernamePasswordAuthenticationFilter.class)
-                // cau hinh luu token o header
-                .sessionManagement(sectionManage -> sectionManage.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(provider())
+                .addFilterBefore(preFilterSecurity, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationProvider provider() {

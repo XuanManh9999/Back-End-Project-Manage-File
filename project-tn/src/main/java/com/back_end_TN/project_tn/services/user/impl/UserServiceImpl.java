@@ -1,8 +1,8 @@
 package com.back_end_TN.project_tn.services.user.impl;
 
+import com.back_end_TN.project_tn.configs.CloudinaryConfig;
 import com.back_end_TN.project_tn.configs.ModelMapperConfig;
 import com.back_end_TN.project_tn.configs.security.SecurityBeansConfig;
-import com.back_end_TN.project_tn.dtos.request.ChangeInfoUserRequest;
 import com.back_end_TN.project_tn.dtos.response.CommonResponse;
 import com.back_end_TN.project_tn.dtos.response.RoleResponseDTO;
 import com.back_end_TN.project_tn.dtos.response.UserResponseDTO;
@@ -15,60 +15,97 @@ import com.back_end_TN.project_tn.exceptions.customs.NotFoundException;
 import com.back_end_TN.project_tn.repositorys.UserEntityRepository;
 import com.back_end_TN.project_tn.services.security.JwtService;
 import com.back_end_TN.project_tn.services.user.UserService;
-import jakarta.transaction.Transactional;
+import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl  implements UserService {
     private final JwtService jwtService;
+    private final CloudinaryConfig cloudinaryConfig;
     private final UserEntityRepository userRepository;
     private final SecurityBeansConfig securityBeansConfig;
     private final ModelMapperConfig modelMapperConfig;
 
-    @Transactional
     @Override
-    public ResponseEntity<CommonResponse> updateUser(ChangeInfoUserRequest request, String token) {
+    public ResponseEntity<CommonResponse> updateUser(
+            String phoneNumber,
+            Gender gender,
+            MultipartFile avatar,
+            MultipartFile background,
+            String token) {
         try {
             String username = jwtService.extractUsername(token, TokenType.ACCESS_TOKEN);
-            Optional<UserEntity> user = userRepository.findByUsername(username);
-            if (user.isPresent()) {
-                UserEntity userEntity = user.get();
-                if (!request.getAvatar().equals("")) {
-                    userEntity.setAvatar(request.getAvatar());
-                }
-//                if (!request.getBirthday().equals("")) {
-//                    userEntity.setBirthday(request.getBirthday());
-//                }
-                if (!request.getGender().equals("")) {
-                    userEntity.setGender(Gender.fromValue(request.getGender()));
-                }
-                if (!request.getPhone_number().equals("")) {
-                    userEntity.setPhoneNumber(request.getPhone_number());
-                }
-                userRepository.save(userEntity);
+            UserEntity userEntity = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new NotFoundException("User not found"));
 
-                UserResponseDTO userResponseDTO = modelMapperConfig.modelMapper().map(userEntity, UserResponseDTO.class);
-                return ResponseEntity.ok()
-                        .body(CommonResponse.builder()
-                                .status(HttpStatus.OK.value())
-                                .message("User updated successfully")
-                                .data(userResponseDTO)
-                                .build());
-            }else {
-                throw new NotFoundException("User not found");
-            }
-        }catch (Exception e) {
+            // Cập nhật avatar nếu có
+            Optional.ofNullable(avatar)
+                    .filter(file -> !file.isEmpty())
+                    .ifPresent(file -> {
+                        try {
+                            Map uploadResult = cloudinaryConfig.cloudinary().uploader().upload(
+                                    file.getBytes(),
+                                    ObjectUtils.asMap("folder", "QUAN_LY_TAI_FILE", "resource_type", "auto")
+                            );
+                            userEntity.setAvatar((String) uploadResult.get("secure_url"));
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error uploading avatar", e);
+                        }
+                    });
+
+
+
+            // Cập nhật avatar nếu có
+            Optional.ofNullable(background)
+                    .filter(file -> !file.isEmpty())
+                    .ifPresent(file -> {
+                        try {
+                            Map uploadResult = cloudinaryConfig.cloudinary().uploader().upload(
+                                    file.getBytes(),
+                                    ObjectUtils.asMap("folder", "QUAN_LY_TAI_FILE", "resource_type", "auto")
+                            );
+                            userEntity.setBackground((String) uploadResult.get("secure_url"));
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error uploading avatar", e);
+                        }
+                    });
+
+            // Cập nhật giới tính nếu có
+            Optional.ofNullable(gender)
+                    .filter(g -> !g.getValue().isEmpty())
+                    .ifPresent(g -> userEntity.setGender(gender));
+
+            // Cập nhật số điện thoại nếu có
+            Optional.ofNullable(phoneNumber)
+                    .filter(p -> !p.isEmpty())
+                    .ifPresent(userEntity::setPhoneNumber);
+
+            userRepository.save(userEntity);
+
+            return ResponseEntity.ok()
+                    .body(CommonResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("User updated successfully")
+                            .build());
+
+        } catch (NotFoundException e) {
+            throw e;
+        } catch (Exception e) {
             throw e;
         }
     }
+
 
     @Override
     public ResponseEntity<CommonResponse> getCurrentUser(String token) {

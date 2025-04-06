@@ -2,6 +2,7 @@ package com.back_end_TN.project_tn.controllers.user;
 
 import com.back_end_TN.project_tn.dtos.request.ChangeInfoUserRequest;
 import com.back_end_TN.project_tn.dtos.response.CommonResponse;
+import com.back_end_TN.project_tn.enums.Gender;
 import com.back_end_TN.project_tn.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -41,8 +45,11 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PutMapping("")
     public ResponseEntity<CommonResponse> updateUser (
-            @RequestBody ChangeInfoUserRequest changeInfoUserRequest,
-            HttpServletRequest request ) {
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) Gender gender,
+            @RequestParam(required = false) MultipartFile avatar,
+            @RequestParam(required = false) MultipartFile background,
+            HttpServletRequest request ) throws IOException {
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
 
@@ -56,7 +63,7 @@ public class UserController {
                             .build());
         }
 
-        return userService.updateUser(changeInfoUserRequest, token);
+        return userService.updateUser(phoneNumber, gender, avatar, background, token);
     }
 
 }

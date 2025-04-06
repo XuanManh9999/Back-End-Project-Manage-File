@@ -22,5 +22,6 @@ public class UserRequest {
     private String email;
     private Date birthday;
     private String avatar;
+    private String backgroud;
     private List<Long> role_ids;
 }

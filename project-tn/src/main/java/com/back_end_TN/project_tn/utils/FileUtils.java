@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 public class FileUtils {
     public static String getFileHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
@@ -17,4 +18,9 @@ public class FileUtils {
         }
         return hexString.toString();
     }
+    public static String randomFileName(String extension) {
+        return UUID.randomUUID().toString() + "." + extension;
+    }
+
+
 }

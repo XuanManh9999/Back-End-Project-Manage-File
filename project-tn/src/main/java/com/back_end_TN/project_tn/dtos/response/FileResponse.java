@@ -9,6 +9,7 @@ public class FileResponse {
     private Long id;
     private String fileName;
     private String fileType;
+    private String cloudinaryUrl;
     private String publicID;
     private Long fileSize;
     private String fileHash;

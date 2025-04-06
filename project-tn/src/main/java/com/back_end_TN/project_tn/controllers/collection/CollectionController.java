@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +17,7 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/collections")
     public ResponseEntity<?> getAllCollectionsByUser(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -35,7 +36,7 @@ public class CollectionController {
         return collectionService.getCollections(token);
     }
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/{collectionID}")
     public ResponseEntity<?> getCollectionByID(HttpServletRequest request, @PathVariable Long collectionID) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -63,7 +64,7 @@ public class CollectionController {
     }
 
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PostMapping("")
     public ResponseEntity<?> addCollection(HttpServletRequest request, @RequestBody CollectionRequest collectionRequest) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -90,7 +91,7 @@ public class CollectionController {
         return collectionService.addCollection(token, collectionRequest);
     }
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @PutMapping("/{collectionId}")
     public ResponseEntity<?> updateCollection(HttpServletRequest request, @RequestBody CollectionRequest collectionRequest, @PathVariable Long collectionId) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -116,7 +117,7 @@ public class CollectionController {
         return collectionService.updateCollection(token, collectionId, collectionRequest);
     }
 
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @DeleteMapping("/{collectionId}")
     public ResponseEntity<?> deleteCollection(HttpServletRequest request, @PathVariable Long collectionId) {
         String authorizationHeader = request.getHeader("Authorization");

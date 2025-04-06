@@ -19,6 +19,7 @@ public class UserResponseDTO {
     private String gender;
     private String email;
     private Date birthday;
+    private String background;
     private String avatar;
     private Active active;
     private Date createdAt;

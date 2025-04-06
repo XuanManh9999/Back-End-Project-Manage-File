@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface CollectionRepository extends JpaRepository<CollectionEntity, Long> {
     List<CollectionEntity> findAllByActive(Active active);
+    List<CollectionEntity> findAllByActiveAndUser(Active active, UserEntity user);
     Optional<CollectionEntity> findByUserAndIdAndActive(UserEntity user, Long id, Active active);
-    Optional<CollectionEntity> findByName(String name);
+
+    Optional<CollectionEntity> findByNameAndActive(String name, Active active);
 }

@@ -87,8 +87,6 @@ public class AuthenticationImpl implements AuthenticationService {
         String assessToken = jwtService.generateAccessToken(user);
         return TokenResponse.builder()
                 .accessToken(assessToken)
-                .refreshToken(token)
-                .userId(user.getId())
                 .build();
     }
 
@@ -322,7 +320,16 @@ public class AuthenticationImpl implements AuthenticationService {
                 authProvider.setUser(userEntity);
                 authProvider.setProviderName(oauthFireBaseRequest.getProvider());
                 authProvider.setActive(Active.HOAT_DONG);
-                authProviderRepository.save(authProvider);
+
+                Optional<RoleEntity> role = roleRepository.findRoleEntityByName(Role.ROLE_USER);
+                if (!role.isPresent()) {
+                    throw new NotFoundException("Error Role not found");
+                }
+                UserRoleEntity userRoleEntity = new UserRoleEntity();
+                userRoleEntity.setUserId(userEntity);
+                userRoleEntity.setRoleId(role.get());
+                userRoleEntity.setActive(Active.HOAT_DONG);
+                userRoleRepository.save(userRoleEntity);
 
                 String accessToken = jwtService.generateAccessToken(userEntity);
                 String refreshToken = jwtService.generateTokenRefreshToken(userEntity);

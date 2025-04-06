@@ -1,7 +1,7 @@
 package com.back_end_TN.project_tn.controllers.file;
 
-import com.back_end_TN.project_tn.configs.CloudinaryConfig;
-import com.back_end_TN.project_tn.dtos.request.UploadFileRequest;
+import com.back_end_TN.project_tn.dtos.request.DeleteFilesRequest;
+import com.back_end_TN.project_tn.dtos.request.FileUpdateRequest;
 import com.back_end_TN.project_tn.dtos.response.CommonResponse;
 import com.back_end_TN.project_tn.services.file.CloudinaryService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,16 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/files")
 public class FileUploadController {
 
     @Autowired
     private CloudinaryService cloudinaryService;
-
-
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFiles(
@@ -51,6 +47,13 @@ public class FileUploadController {
         return cloudinaryService.uploadFiles(files, token, collectionID);
     }
 
+    @PutMapping(value = "/{fileId}")
+    public ResponseEntity<?> updateFile(
+            @PathVariable("fileId") Long fileId,
+            @RequestBody FileUpdateRequest request
+            ) {
+        return cloudinaryService.updateFile(fileId, request);
+    }
 
 
     @DeleteMapping("/{fileId}")
@@ -72,6 +75,26 @@ public class FileUploadController {
 
         // Gọi service xóa file
         return cloudinaryService.deleteFile(fileId, token);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteAllFiles(
+            @RequestBody DeleteFilesRequest request,
+        @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(CommonResponse.builder()
+                            .status(HttpStatus.UNAUTHORIZED.value())
+                            .message("Unauthorized")
+                            .build());
+        }
+
+        // Gọi service xóa file
+        return cloudinaryService.deleteFiles(request, token);
     }
 
 }

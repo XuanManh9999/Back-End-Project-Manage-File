@@ -1,5 +1,6 @@
 package com.back_end_TN.project_tn.services.collection.impl;
 
+import com.back_end_TN.project_tn.configs.CloudinaryConfig;
 import com.back_end_TN.project_tn.configs.ModelMapperConfig;
 import com.back_end_TN.project_tn.dtos.request.CollectionRequest;
 import com.back_end_TN.project_tn.dtos.response.CollectionResponse;
@@ -15,6 +16,7 @@ import com.back_end_TN.project_tn.repositorys.UserEntityRepository;
 import com.back_end_TN.project_tn.services.collection.CollectionService;
 import com.back_end_TN.project_tn.services.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CollectionServiceImpl implements CollectionService {
-
+    private final CloudinaryConfig cloudinaryConfig;
     private final CollectionRepository collectionRepository;
     private final UserEntityRepository userRepository;
     private final JwtService jwtService;
@@ -49,7 +51,9 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public ResponseEntity<?> getCollections(String token) {
         try {
-            List<CollectionEntity> collectionEntityList = collectionRepository.findAllByActive(Active.HOAT_DONG);
+            UserEntity userEntity = getUserEntityByToken(token);
+
+            List<CollectionEntity> collectionEntityList = collectionRepository.findAllByActiveAndUser(Active.HOAT_DONG, userEntity);
             List<CollectionResponse> collectionResponseList = new ArrayList<>();
             for (CollectionEntity collectionEntity : collectionEntityList) {
                 CollectionResponse collectionResponse = modelMapperConfig.modelMapper().map(collectionEntity, CollectionResponse.class);
@@ -90,7 +94,7 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public ResponseEntity<?> addCollection(String token, CollectionRequest collectionRequest) {
         try {
-            Optional<CollectionEntity> collection = collectionRepository.findByName(collectionRequest.getName());
+            Optional<CollectionEntity> collection = collectionRepository.findByNameAndActive(collectionRequest.getName(), Active.HOAT_DONG);
             if (collection.isPresent()) {
                 throw new DuplicateResourceException("Collection already exists");
             }else {

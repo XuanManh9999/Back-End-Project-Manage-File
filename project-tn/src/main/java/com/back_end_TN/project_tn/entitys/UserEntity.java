@@ -49,10 +49,15 @@ public class UserEntity extends BaseEntity<Long> implements UserDetails, Seriali
      @Column(name = "avatar", columnDefinition = "TEXT")
      private String avatar;
 
-     @Column
-     @Min(value = 10)
-     @Max(value = 10)
+     @Column(name = "phoneNumber")
      private String phoneNumber;
+
+
+     @Column(name = "background")
+     private String background;
+
+
+
 
      @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
      private List<UserRoleEntity> userRoles;
@@ -62,7 +67,6 @@ public class UserEntity extends BaseEntity<Long> implements UserDetails, Seriali
 
      @OneToMany(mappedBy = "userId")
      private List<Address> addresses;
-
 
      @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
      private List<FileEntity> files;

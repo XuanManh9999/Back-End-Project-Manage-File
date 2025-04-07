@@ -15,5 +15,5 @@ public interface CollectionRepository extends JpaRepository<CollectionEntity, Lo
     List<CollectionEntity> findAllByActiveAndUser(Active active, UserEntity user);
     Optional<CollectionEntity> findByUserAndIdAndActive(UserEntity user, Long id, Active active);
 
-    Optional<CollectionEntity> findByNameAndActive(String name, Active active);
+    Optional<CollectionEntity> findByNameAndActiveAndUser(String name, Active active, UserEntity user);
 }

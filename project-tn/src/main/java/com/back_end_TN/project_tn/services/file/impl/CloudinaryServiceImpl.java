@@ -54,7 +54,6 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("File " + file.getOriginalFilename() + " đã tồn tại!");
             }
 
-            // Upload file lên Cloudinary với folder và resource_type tự động
             Map uploadResult = cloudinaryConfig.cloudinary().uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap("folder", "QUAN_LY_TAI_FILE", "resource_type", "auto")

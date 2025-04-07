@@ -1,6 +1,5 @@
 package com.back_end_TN.project_tn.controllers.user;
 
-import com.back_end_TN.project_tn.dtos.request.ChangeInfoUserRequest;
 import com.back_end_TN.project_tn.dtos.response.CommonResponse;
 import com.back_end_TN.project_tn.enums.Gender;
 import com.back_end_TN.project_tn.services.user.UserService;
@@ -65,5 +64,9 @@ public class UserController {
 
         return userService.updateUser(phoneNumber, gender, avatar, background, token);
     }
+
+
+
+
 
 }

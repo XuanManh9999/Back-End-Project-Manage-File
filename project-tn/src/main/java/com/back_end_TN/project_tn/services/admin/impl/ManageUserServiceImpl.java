@@ -136,13 +136,25 @@ public class ManageUserServiceImpl implements ManageUserService {
     public ResponseEntity<CommonResponse> addUser(UserRequest userRequest) {
         try {
             Optional<UserEntity> user = userRepository.findByUsername(userRequest.getUser_name());
-            Optional<UserEntity> user2 = userRepository.findByEmail(userRequest.getEmail());
-            if (user.isPresent() || user2.isPresent()) {
+
+            if (userRequest.getEmail() != null && !userRequest.getEmail().isEmpty()) {
+                Optional<UserEntity> user2 = userRepository.findByEmail(userRequest.getEmail());
+                if (user2.isPresent()) {
+                    throw new DuplicateResourceException("Tài khoản đã tồn tại trong hệ thống");
+                }
+            }
+
+            if (user.isPresent() ) {
                 throw new DuplicateResourceException("Tài khoản đã tồn tại trong hệ thống");
             }
             UserEntity userEntity = new UserEntity();
             userEntity.setUsername(userRequest.getUser_name());
-            userEntity.setEmail(userRequest.getEmail());
+
+            if (userRequest.getEmail() != null && !userRequest.getEmail().isEmpty()) {
+                userEntity.setEmail(userRequest.getEmail());
+            }
+
+
             userEntity.setActive(Active.HOAT_DONG);
             userEntity.setBirthday(userRequest.getBirthday());
             userEntity.setPassword(securityBeansConfig.passwordEncoder().encode(userRequest.getPassword()));
@@ -186,13 +198,19 @@ public class ManageUserServiceImpl implements ManageUserService {
                 if (userRequest.getActive() != null) {
                     userEntity.setActive(userRequest.getActive());
                 }
-                userEntity.setPassword(securityBeansConfig.passwordEncoder().encode(userRequest.getPassword()));
-                userEntity.setBirthday(userRequest.getBirthday());
-                userEntity.setGender(userRequest.getGender());
+                if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
+                    userEntity.setPassword(securityBeansConfig.passwordEncoder().encode(userRequest.getPassword()));
+                }
+                if (userRequest.getGender() != null && !userRequest.getGender().getValue().isEmpty()) {
+                    userEntity.setGender(userRequest.getGender());
+                }
                 userEntity.setAvatar(userRequest.getAvatar());
                 userRepository.save(userEntity);
+                userRoleRepository.deleteUserRolesByUserId(userId);
+
                 for (Long role_id : userRequest.getRole_ids()) {
                     Optional<RoleEntity> roleEntity = roleRepository.findById(role_id);
+
                     if (roleEntity.isPresent()) {
                         Optional<UserRoleEntity> userRoleEntity = userRoleRepository.findUserRoleEntitiesByUserIdAndRoleId(userEntity, roleEntity.get());
                         if (!userRoleEntity.isPresent()) {
@@ -254,6 +272,66 @@ public class ManageUserServiceImpl implements ManageUserService {
         }
         catch (Exception e) {
             throw e;
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> getAllRoles() {
+        try {
+            List<RoleResponseDTO> roleResponseDTOS = new ArrayList<>();
+            List<RoleEntity> roleEntities = roleRepository.findAll();
+            for (RoleEntity roleEntity : roleEntities) {
+                RoleResponseDTO roleResponseDTO = modelMapper.map(roleEntity, RoleResponseDTO.class);
+                roleResponseDTO.setCreatedAt(roleEntity.getCreateAt());
+                roleResponseDTO.setUpdatedAt(roleEntity.getUpdateAt());
+                roleResponseDTOS.add(roleResponseDTO);
+            }
+            return ResponseEntity.ok().body(
+                    CommonResponse.builder()
+                            .status(HttpStatus.OK.value())
+                            .message("Get All Roles Done")
+                            .data(roleResponseDTOS)
+                            .build()
+            );
+        }catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> getUserByName(String name) {
+        try {
+            Optional<UserEntity> user = userRepository.findByUsername(name);
+            if (user.isPresent()) {
+                UserResponseDTO userResponse = modelMapper.map(user, UserResponseDTO.class);
+                userResponse.setCreatedAt(user.get().getCreateAt());
+                userResponse.setUpdatedAt(user.get().getUpdateAt());
+
+                List<RoleResponseDTO> roleResponseDTOS = new ArrayList<>();
+                List<UserRoleEntity> userRoleEntities = user.get().getUserRoles();
+                for (UserRoleEntity userRoleEntity : userRoleEntities) {
+                    RoleEntity roleEntity = userRoleEntity.getRoleId();
+                    RoleResponseDTO roleResponseDTO = new RoleResponseDTO();
+                    roleResponseDTO.setId(roleEntity.getId());
+                    roleResponseDTO.setName(roleEntity.getName());
+                    roleResponseDTO.setDescRole(roleEntity.getDescRole());
+                    roleResponseDTO.setCreatedAt(roleEntity.getCreateAt());
+                    roleResponseDTO.setUpdatedAt(roleEntity.getUpdateAt());
+                    roleResponseDTOS.add(roleResponseDTO);
+                }
+                userResponse.setRoles(roleResponseDTOS);
+                return ResponseEntity.ok().body(
+                        CommonResponse.builder()
+                                .status(HttpStatus.OK.value())
+                                .message("Get User By Name Done")
+                                .data(userResponse)
+                                .build()
+                );
+            }else {
+                throw new  NotFoundException("User not found");
+            }
+        }catch (Exception ex) {
+            throw ex;
         }
     }
 

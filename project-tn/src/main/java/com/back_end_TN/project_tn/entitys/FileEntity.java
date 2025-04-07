@@ -14,10 +14,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FileEntity extends BaseEntity<Long>{
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String fileName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String cloudinaryUrl;
 
     @Column(nullable = false)
@@ -29,7 +29,7 @@ public class FileEntity extends BaseEntity<Long>{
     @Column(nullable = false)
     private Long fileSize;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String fileHash;
 
     @ManyToOne

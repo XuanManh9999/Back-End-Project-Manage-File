@@ -30,6 +30,27 @@ public class ManageUserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/roles")
+    public ResponseEntity<?> getAllRoles () {
+        return manageUserService.getAllRoles();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/by-name")
+    public ResponseEntity<?> getAllUsersByName (@RequestParam String name) {
+        if (name == null || name.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    CommonResponse.builder()
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .message("name is required")
+                            .build()
+            );
+        }
+        return manageUserService.getUserByName(name);
+    }
+
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/by-id/{userId}")
     public ResponseEntity<CommonResponse> getUserById(@PathVariable Long userId) {
         if (userId == null) {

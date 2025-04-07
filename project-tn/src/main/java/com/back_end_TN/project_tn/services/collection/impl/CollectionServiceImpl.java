@@ -94,7 +94,9 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public ResponseEntity<?> addCollection(String token, CollectionRequest collectionRequest) {
         try {
-            Optional<CollectionEntity> collection = collectionRepository.findByNameAndActive(collectionRequest.getName(), Active.HOAT_DONG);
+            UserEntity entity = getUserEntityByToken(token);
+
+            Optional<CollectionEntity> collection = collectionRepository.findByNameAndActiveAndUser(collectionRequest.getName(), Active.HOAT_DONG, entity);
             if (collection.isPresent()) {
                 throw new DuplicateResourceException("Collection already exists");
             }else {

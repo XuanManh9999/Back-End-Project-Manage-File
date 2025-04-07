@@ -56,9 +56,6 @@ public class UserEntity extends BaseEntity<Long> implements UserDetails, Seriali
      @Column(name = "background")
      private String background;
 
-
-
-
      @OneToMany(mappedBy = "userId", orphanRemoval = true, fetch = FetchType.EAGER)
      private List<UserRoleEntity> userRoles;
 

@@ -71,7 +71,7 @@ public class DataSeeder implements CommandLineRunner  {
         if (!admin.isPresent()) {
             UserEntity user = new UserEntity();
             user.setUsername("admin");
-            String passwordEncrypted = "$2a$10$115OmNgmZtyyIQS01oV12eMqcj019L3f3BXLaFGv7hvATjskPqOJW";
+            String passwordEncrypted = "$2a$10$NznSkz9.j8a2JAKa2aGYaOMD3wi6dB5Qt/6mwLmtB/Iqd6o38JlrC";
             user.setPassword(passwordEncrypted); // Mã hóa mật khẩu
             user.setActive(Active.HOAT_DONG);
             userEntityRepository.save(user);
